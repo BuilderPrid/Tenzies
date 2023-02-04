@@ -3,20 +3,27 @@ import "./App.css";
 import Die from "./components/Die";
 import { nanoid } from "nanoid";
 import Confetti from "react-confetti";
+localStorage.setItem("best", 100000);
 export default function App() {
   const [dice, setDice] = React.useState(allNewDice());
-
   const [tenzies, setTenzies] = React.useState(false);
-
+  const [rolls, setRolls] = React.useState(0);
   React.useEffect(() => {
     const val = dice[0].value;
+    // console.log("effeft ran");
+    // setRolls((prevrolls) => prevrolls + 1);
     const allSame = dice.every((die) => die.value === val);
     const allHeld = dice.every((die) => die.isHeld === true);
+    console.log(rolls);
     if (allSame && allHeld) {
       setTenzies(true);
-      console.log("you won");
+      if (rolls < localStorage.getItem("best")) {
+        console.log("Success", rolls);
+        localStorage.setItem("best", rolls);
+        // setRolls(0);
+      }
     }
-  }, [dice]);
+  }, [dice, rolls]);
 
   function allNewDice() {
     const newDice = [];
@@ -39,6 +46,7 @@ export default function App() {
   }
 
   function rollDice() {
+    setRolls((prev) => prev + 1);
     if (!tenzies) {
       setDice((prevDice) =>
         prevDice.map((die) => {
@@ -54,6 +62,7 @@ export default function App() {
     } else {
       setTenzies(false);
       setDice(allNewDice());
+      setRolls(0);
     }
   }
 
@@ -78,6 +87,8 @@ export default function App() {
       <button className="dice-roll" onClick={rollDice}>
         {tenzies ? "New Game" : "Roll"}
       </button>
+      {tenzies && <p>It took you {rolls} rolls</p>}
+      {tenzies && <p>Best time:{localStorage.getItem("best")}</p>}
     </main>
   );
 }
